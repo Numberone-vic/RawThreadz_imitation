@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Products - Raw ThreadZ Clothing Brand</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="The ultimate streetwear clothing brand that combines urban style with high-quality material. Our collections feature graphic tees designed to elevate your street style. Join us in being unscripted in how you live and dress, shop Raw ThreadZ!">
+
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Trirong:wght@400;700&family=Bodoni+Moda:wght@900&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">RAW THREADZ</div>
+      <nav class="nav">
+        <a href="#">Home</a>
+        <a href="#" class="active">Products</a>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+      </nav>
+      <button class="cart-btn" id="cartButton">
+        Cart <span id="cartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div>
+          <h1>Unscripted Streetwear.</h1>
+          <p>
+            Graphic tees and streetwear that match how you actually live—
+            bold, unapologetic, and high quality.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="products-section">
+      <div class="container">
+        <div class="products-header">
+          <h2>All Products</h2>
+          <div class="filters">
+            <select id="sortSelect">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+          <!-- Products injected by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-inner">
+      <button class="cart-close" id="cartClose">&times;</button>
+      <h3>Your Cart</h3>
+      <div id="cartItems"></div>
+      <div class="cart-footer">
+        <div class="cart-total">
+          Total: $<span id="cartTotal">0.00</span>
+        </div>
+        <button class="btn-primary">Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>&copy; <span id="year"></span> Raw ThreadZ Clothing Brand. All rights reserved.</p>
+      <p class="tagline">Be unscripted in how you live and dress.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
