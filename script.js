@@ -1,130 +1,100 @@
-// Simple product data (replace with your real products or fetch from an API)
 const products = [
-  {
-    id: 1,
-    title: "Raw Script Tee",
-    price: 35,
-    tagline: "Classic Raw ThreadZ script logo on premium cotton.",
-    image: "https://via.placeholder.com/600x600?text=Raw+Script+Tee"
-  },
-  {
-    id: 2,
-    title: "Unscripted Graphic Tee",
-    price: 40,
-    tagline: "Bold graphic for unapologetic street style.",
-    image: "https://via.placeholder.com/600x600?text=Unscripted+Tee"
-  },
-  {
-    id: 3,
-    title: "Midnight Street Hoodie",
-    price: 65,
-    tagline: "Heavyweight hoodie built for late-night moves.",
-    image: "https://via.placeholder.com/600x600?text=Midnight+Hoodie"
-  },
-  {
-    id: 4,
-    title: "City Grid Tee",
-    price: 38,
-    tagline: "Urban grid design inspired by city blocks.",
-    image: "https://via.placeholder.com/600x600?text=City+Grid+Tee"
-  }
+  { id:1, title:"Raw Tee", price:35, image:"https://via.placeholder.com/300" },
+  { id:2, title:"Graphic Tee", price:40, image:"https://via.placeholder.com/300" },
+  { id:3, title:"Hoodie", price:65, image:"https://via.placeholder.com/300" }
 ];
 
-let cart = [];
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-const productsGrid = document.getElementById("productsGrid");
-const sortSelect = document.getElementById("sortSelect");
-const cartButton = document.getElementById("cartButton");
-const cartDrawer = document.getElementById("cartDrawer");
-const cartClose = document.getElementById("cartClose");
+const grid = document.getElementById("productsGrid");
 const cartItems = document.getElementById("cartItems");
 const cartTotal = document.getElementById("cartTotal");
 const cartCount = document.getElementById("cartCount");
-const yearSpan = document.getElementById("year");
+const cartDrawer = document.getElementById("cartDrawer");
+const cartEmpty = document.getElementById("cartEmpty");
 
-yearSpan.textContent = new Date().getFullYear();
-
-function renderProducts(list) {
-  productsGrid.innerHTML = "";
-  list.forEach((p) => {
-    const card = document.createElement("article");
-    card.className = "product-card";
-    card.innerHTML = `
-      <div class="product-image" style="background-image:url('${p.image}')"></div>
-      <h3 class="product-title">${p.title}</h3>
-      <div class="product-price">$${p.price.toFixed(2)}</div>
-      <p class="product-tagline">${p.tagline}</p>
-      <button class="btn-primary" data-id="${p.id}">Add to cart</button>
+/* PRODUCTS */
+function renderProducts(list){
+  grid.innerHTML = "";
+  list.forEach(p=>{
+    grid.innerHTML += `
+      <div class="product-card">
+        <div class="product-image" style="background:url('${p.image}')"></div>
+        <h3>${p.title}</h3>
+        <p>$${p.price}</p>
+        <button class="btn-primary" onclick="addToCart(${p.id})">Add</button>
+      </div>
     `;
-    productsGrid.appendChild(card);
   });
 }
 
-function sortProducts(mode) {
-  const sorted = [...products];
-  if (mode === "price-asc") {
-    sorted.sort((a, b) => a.price - b.price);
-  } else if (mode === "price-desc") {
-    sorted.sort((a, b) => b.price - a.price);
-  }
-  renderProducts(sorted);
+/* CART */
+function saveCart(){
+  localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-function openCart() {
-  cartDrawer.classList.add("open");
+function addToCart(id){
+  const item = cart.find(i=>i.id===id);
+  if(item) item.qty++;
+  else cart.push({...products.find(p=>p.id===id), qty:1});
+  updateCart();
 }
 
-function closeCart() {
-  cartDrawer.classList.remove("open");
+function updateQty(id,change){
+  const item = cart.find(i=>i.id===id);
+  item.qty += change;
+  if(item.qty<=0) cart = cart.filter(i=>i.id!==id);
+  updateCart();
 }
 
-function updateCartUI() {
+function updateCart(){
   cartItems.innerHTML = "";
   let total = 0;
-  cart.forEach((item) => {
-    total += item.price * item.qty;
-    const row = document.createElement("div");
-    row.className = "cart-item";
-    row.innerHTML = `
-      <span>${item.title} x ${item.qty}</span>
-      <span>$${(item.price * item.qty).toFixed(2)}</span>
+
+  cart.forEach(i=>{
+    total += i.price*i.qty;
+
+    cartItems.innerHTML += `
+      <div class="cart-item">
+        <div>
+          ${i.title}
+          <div class="qty-controls">
+            <button onclick="updateQty(${i.id},-1)">-</button>
+            ${i.qty}
+            <button onclick="updateQty(${i.id},1)">+</button>
+          </div>
+        </div>
+        <span>$${i.price*i.qty}</span>
+      </div>
     `;
-    cartItems.appendChild(row);
   });
+
+  cartEmpty.style.display = cart.length ? "none":"block";
   cartTotal.textContent = total.toFixed(2);
-  cartCount.textContent = cart.reduce((sum, i) => sum + i.qty, 0);
+  cartCount.textContent = cart.reduce((a,b)=>a+b.qty,0);
+
+  saveCart();
 }
 
-function addToCart(id) {
-  const product = products.find((p) => p.id === id);
-  if (!product) return;
-  const existing = cart.find((c) => c.id === id);
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({ ...product, qty: 1 });
-  }
-  updateCartUI();
-}
+/* SEARCH */
+document.getElementById("searchInput").oninput = e=>{
+  const term = e.target.value.toLowerCase();
+  renderProducts(products.filter(p=>p.title.toLowerCase().includes(term)));
+};
 
-// Event listeners
+/* SORT */
+document.getElementById("sortSelect").onchange = e=>{
+  const val = e.target.value;
+  let sorted=[...products];
+  if(val==="price-asc") sorted.sort((a,b)=>a.price-b.price);
+  if(val==="price-desc") sorted.sort((a,b)=>b.price-a.price);
+  renderProducts(sorted);
+};
 
-productsGrid.addEventListener("click", (e) => {
-  if (e.target.matches("button[data-id]")) {
-    const id = Number(e.target.getAttribute("data-id"));
-    addToCart(id);
-  }
-});
+/* CART TOGGLE */
+document.getElementById("cartButton").onclick=()=>cartDrawer.classList.add("open");
+document.getElementById("cartClose").onclick=()=>cartDrawer.classList.remove("open");
 
-sortSelect.addEventListener("change", (e) => {
-  sortProducts(e.target.value);
-});
-
-cartButton.addEventListener("click", openCart);
-cartClose.addEventListener("click", closeCart);
-cartDrawer.addEventListener("click", (e) => {
-  if (e.target === cartDrawer) closeCart();
-});
-
-// Initial render
 renderProducts(products);
+updateCart();
+document.getElementById("year").textContent=new Date().getFullYear();
